@@ -5,12 +5,13 @@ import { IPokemon } from "@/types/pokemon";
 import { memo, useEffect, useState } from "react";
 import { PokemonCard } from "./pokemon/PokemonCard";
 import { PokemonLayout } from "./pokemon/PokemonLayout";
+import PokemonSkeletonCard from "./pokemon/PokemonSkeletonCard";
 import { Button } from "./ui/button";
-import { Loading } from "./ui/loading";
 
 export const Pokemons = memo(function Pokemons() {
+	const [isLoading, setIsLoading] = useState<boolean>(true);
 	const [apiUrl, setApiUrl] = useState<string | null>(API_URL);
-	const [pokemons, setPokemons] = useState<IPokemon[] | null>();
+	const [pokemons, setPokemons] = useState<IPokemon[]>([]);
 	const [next, setNext] = useState<string | null>(null);
 	const [previous, setPrevious] = useState<string | null>(null);
 
@@ -35,10 +36,12 @@ export const Pokemons = memo(function Pokemons() {
 				);
 
 				setPokemons(pokemonDetails);
+				setIsLoading(false);
 				setNext(json.next);
 				setPrevious(json.previous);
 			} catch (error) {
 				console.error(error);
+				setIsLoading(false);
 			}
 		}
 		fetchPokemon();
@@ -67,18 +70,16 @@ export const Pokemons = memo(function Pokemons() {
 
 	return (
 		<>
-			{!pokemons ? (
-				<Loading />
-			) : (
-				<>
-					<PokemonLayout>
-						{pokemons.map(pokemon => (
+			<PokemonLayout>
+				{isLoading
+					? Array(6)
+							.fill(0)
+							.map((_, index) => <PokemonSkeletonCard key={index} />)
+					: pokemons.map(pokemon => (
 							<PokemonCard key={pokemon.id} {...pokemon} />
-						))}
-					</PokemonLayout>
-					<Navigation />
-				</>
-			)}
+					  ))}
+			</PokemonLayout>
+			<Navigation />
 		</>
 	);
 });
