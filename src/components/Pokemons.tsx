@@ -25,8 +25,6 @@ export const Pokemons = memo(function Pokemons() {
 
 				const json: IPokemonBaseUrl = await response.json();
 
-				console.log(json);
-
 				// Map through the results and add the id
 				const pokemonsWithId =
 					json.results?.map(pokemon => {

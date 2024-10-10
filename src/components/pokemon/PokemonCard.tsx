@@ -5,11 +5,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { Card } from "../ui/card";
 
-export function PokemonCard({ id, name, url }: IPokemon) {
-	console.log(id, name, url);
+export function PokemonCard({ id, name }: IPokemon) {
 	return (
 		<Card className='flex flex-col justify-center items-center'>
-			<Link href={url}>
+			<Link href={`/pokemon/${id}`}>
 				<Image
 					alt={`${name}`}
 					width={100}
