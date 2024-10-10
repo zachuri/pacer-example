@@ -9,6 +9,7 @@ import PokemonSkeletonCard from "./pokemon/PokemonSkeletonCard";
 import { Button } from "./ui/button";
 
 export const Pokemons = memo(function Pokemons() {
+	const [error, setError] = useState<string | null>("");
 	const [isLoading, setIsLoading] = useState<boolean>(true);
 	const [apiUrl, setApiUrl] = useState<string | null>(API_URL);
 	const [pokemons, setPokemons] = useState<IPokemon[]>([]);
@@ -41,6 +42,7 @@ export const Pokemons = memo(function Pokemons() {
 				setPrevious(json.previous);
 			} catch (error) {
 				console.error(error);
+				setError("Failed to fetch data");
 				setIsLoading(false);
 			}
 		}
@@ -66,6 +68,10 @@ export const Pokemons = memo(function Pokemons() {
 				</Button>
 			</div>
 		);
+	}
+
+	if (error) {
+		return <div className='text-center text-red-500'>{error}</div>;
 	}
 
 	return (
