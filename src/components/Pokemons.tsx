@@ -18,8 +18,6 @@ export const Pokemons = memo(function Pokemons() {
 	const [next, setNext] = useState<string | null>(null);
 	const [previous, setPrevious] = useState<string | null>(null);
 
-	console.log("POKEMONS", pokemons);
-
 	useEffect(() => {
 		if (pokemons.length === 0) {
 			setIsLoadingPokemons(true);
@@ -68,7 +66,7 @@ export const Pokemons = memo(function Pokemons() {
 
 	function Navigation() {
 		return (
-			<div className='flex col-span-4 items-center justify-center gap-4'>
+			<div className='flex col-span-full items-center justify-center gap-4'>
 				<Button onClick={handlePrevious} disabled={!previous}>
 					Previous
 				</Button>
@@ -84,20 +82,19 @@ export const Pokemons = memo(function Pokemons() {
 	}
 
 	return (
-		<>
-			<div className='container mx-auto'>
-				<Input placeholder='Enter your favorite pokemon' />
-			</div>
-			<PokemonLayout>
-				{isLoadingPokemons && pokemons.length === 0
-					? Array(6)
-							.fill(0)
-							.map((_, index) => <PokemonSkeletonCard key={index} />)
-					: pokemons.map(pokemon => (
-							<PokemonCard key={pokemon.id} {...pokemon} />
-					  ))}
-			</PokemonLayout>
+		<PokemonLayout>
+			<Input
+				className='col-span-full'
+				placeholder='Enter your favorite pokemon'
+			/>
+			{isLoadingPokemons && pokemons.length === 0
+				? Array(6)
+						.fill(0)
+						.map((_, index) => <PokemonSkeletonCard key={index} />)
+				: pokemons.map(pokemon => (
+						<PokemonCard key={pokemon.id} {...pokemon} />
+				  ))}
 			<Navigation />
-		</>
+		</PokemonLayout>
 	);
 });

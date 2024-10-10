@@ -16,7 +16,7 @@ const usePokemonStore = create<IPokemonState>()(
 	persist(
 		set => ({
 			pokemons: [],
-			isLoadingPokemons: false,
+			isLoadingPokemons: true,
 			setPokemons: pokemons => set({ pokemons }),
 			setIsLoadingPokemons: isLoading => set({ isLoadingPokemons: isLoading }),
 			addPokemon: pokemon =>
@@ -31,7 +31,7 @@ const usePokemonStore = create<IPokemonState>()(
 		}),
 		{
 			name: "pokemon-storage",
-			storage: createJSONStorage(() => sessionStorage),
+			storage: createJSONStorage(() => localStorage),
 		}
 	)
 );
