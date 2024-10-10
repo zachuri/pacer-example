@@ -1,9 +1,12 @@
 "use client";
 
 import { EBackend } from "@/consts/api";
-import { useEffect } from "react";
+import { IPokemon, IPokemonBaseUrl } from "@/types/pokemon";
+import { useEffect, useState } from "react";
 
 export default function Home() {
+	const [pokemons, setPokemons] = useState<IPokemon[] | null>();
+
 	useEffect(() => {
 		async function fetchPokemon() {
 			try {
@@ -13,8 +16,9 @@ export default function Home() {
 					throw new Error(`Response status: ${response.status}`);
 				}
 
-				const json = await response.json();
+				const json: IPokemonBaseUrl = await response.json();
 				console.log(json);
+				setPokemons(json.results);
 			} catch (error) {
 				console.error(error);
 			}
@@ -26,6 +30,11 @@ export default function Home() {
 	return (
 		<div className='flex flex-col justify-center items-center min-h-screen'>
 			<h1 className='font-medium text-5xl'>Pokemon Finder</h1>
+			<ul>
+				{pokemons?.map(pokemon => (
+					<li key={pokemon.name}>{pokemon.name}</li>
+				))}
+			</ul>
 		</div>
 	);
 }
