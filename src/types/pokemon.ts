@@ -24,15 +24,26 @@ interface ISpriteSet {
 export interface IPokemon {
 	id: number;
 	name: string;
-	url: string;
-}
-
-
-export interface IPokemonBaseUrl {
-	count: number;
-	next: string | null;
-	previous: string | null;
-	results: IPokemon[] | null;
+	sprites: {
+		front_default: string;
+	};
+	types: {
+		type: {
+			name: string;
+		};
+	}[];
+	stats: {
+		base_stat: number;
+		stat: {
+			name: string;
+		};
+	}[];
+	abilities: {
+		ability: {
+			name: string;
+		};
+	}[];
+	base_experience: number;
 }
 
 export interface IPokemonInfo {

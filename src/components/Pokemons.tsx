@@ -1,7 +1,7 @@
 "use client";
 
 import { API_URL } from "@/consts/api";
-import { IPokemon, IPokemonBaseUrl } from "@/types/pokemon";
+import { IPokemon  } from "@/types/pokemon";
 import { memo, useEffect, useState } from "react";
 import { PokemonCard } from "./pokemon/PokemonCard";
 import { PokemonLayout } from "./pokemon/PokemonLayout";
@@ -23,17 +23,18 @@ export const Pokemons = memo(function Pokemons() {
 					throw new Error(`Response status: ${response.status}`);
 				}
 
-				const json: IPokemonBaseUrl = await response.json();
+				const json = await response.json();
 
 				// Map through the results and add the id
-				const pokemonsWithId =
-					json.results?.map(pokemon => {
-						const urlParts = pokemon.url.split("/");
-						const id = parseInt(urlParts[urlParts.length - 2]);
-						return { ...pokemon, id };
-					}) || [];
 
-				setPokemons(pokemonsWithId);
+				const pokemonDetails = await Promise.all(
+					json.results.map(async (pokemon: { url: string }) => {
+						const res = await fetch(pokemon.url);
+						return res.json();
+					})
+				);
+
+				setPokemons(pokemonDetails);
 				setNext(json.next);
 				setPrevious(json.previous);
 			} catch (error) {
