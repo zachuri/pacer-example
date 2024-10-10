@@ -2,10 +2,9 @@
 
 import { EBackend } from "@/consts/api";
 import { IPokemon, IPokemonBaseUrl } from "@/types/pokemon";
-import Image from "next/image";
-import Link from "next/link";
 import { memo, useEffect, useState } from "react";
-import { Card } from "./ui/card";
+import { PokemonCard } from "./pokemon/PokemonCard";
+import { PokemonLayout } from "./pokemon/PokemonLayout";
 import { Loading } from "./ui/loading";
 
 export const Pokemons = memo(function Pokemons() {
@@ -36,7 +35,6 @@ export const Pokemons = memo(function Pokemons() {
 				console.error(error);
 			}
 		}
-
 		fetchPokemon();
 	}, []);
 
@@ -45,23 +43,11 @@ export const Pokemons = memo(function Pokemons() {
 			{!pokemons ? (
 				<Loading />
 			) : (
-				<div className='grid grid-cols-4 gap-10'>
+				<PokemonLayout>
 					{pokemons.map(pokemon => (
-						<Card
-							key={pokemon.name}
-							className='flex flex-col justify-center items-center'>
-							<Link href={pokemon.url}>
-								<Image
-									alt={`${pokemon.name}`}
-									width={100}
-									height={100}
-									src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png`}
-								/>
-							</Link>
-							<h1 className='capitalize'>{pokemon.name}</h1>
-						</Card>
+						<PokemonCard key={pokemon.id} {...pokemon} />
 					))}
-				</div>
+				</PokemonLayout>
 			)}
 		</>
 	);
