@@ -17,7 +17,7 @@ export const Pokemons = memo(function Pokemons() {
 	useEffect(() => {
 		async function fetchPokemon() {
 			try {
-				const response = await fetch(apiUrl || "");
+				const response = await fetch(`${apiUrl}?limit=6` || "");
 
 				if (!response.ok) {
 					throw new Error(`Response status: ${response.status}`);
