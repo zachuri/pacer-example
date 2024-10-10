@@ -1,25 +1,34 @@
 "use client";
 
 import { API_URL } from "@/consts/api";
-import { IPokemon } from "@/types/pokemon";
+import usePokemonStore from "@/store/pokemonStore";
 import { memo, useEffect, useState } from "react";
 import { PokemonCard } from "./pokemon/PokemonCard";
 import { PokemonLayout } from "./pokemon/PokemonLayout";
 import PokemonSkeletonCard from "./pokemon/PokemonSkeletonCard";
 import { Button } from "./ui/button";
+import { Input } from "./ui/input";
 
 export const Pokemons = memo(function Pokemons() {
 	const [error, setError] = useState<string | null>("");
-	const [isLoading, setIsLoading] = useState<boolean>(true);
 	const [apiUrl, setApiUrl] = useState<string | null>(API_URL);
-	const [pokemons, setPokemons] = useState<IPokemon[]>([]);
+	// const [pokemons, setPokemons] = useState<IPokemon[]>([]);
+	const { pokemons, setPokemons, isLoadingPokemons, setIsLoadingPokemons } =
+		usePokemonStore();
 	const [next, setNext] = useState<string | null>(null);
 	const [previous, setPrevious] = useState<string | null>(null);
 
+	console.log("POKEMONS", pokemons);
+
 	useEffect(() => {
+		if (pokemons.length === 0) {
+			setIsLoadingPokemons(true);
+		}
+
 		async function fetchPokemon() {
+			console.log("FETCHED");
 			try {
-				const response = await fetch(`${apiUrl}?limit=6` || "");
+				const response = await fetch(`${apiUrl}?limit=6`);
 
 				if (!response.ok) {
 					throw new Error(`Response status: ${response.status}`);
@@ -37,13 +46,13 @@ export const Pokemons = memo(function Pokemons() {
 				);
 
 				setPokemons(pokemonDetails);
-				setIsLoading(false);
+				setIsLoadingPokemons(false);
 				setNext(json.next);
 				setPrevious(json.previous);
 			} catch (error) {
 				console.error(error);
 				setError("Failed to fetch data");
-				setIsLoading(false);
+				setIsLoadingPokemons(false);
 			}
 		}
 		fetchPokemon();
@@ -76,8 +85,11 @@ export const Pokemons = memo(function Pokemons() {
 
 	return (
 		<>
+			<div className='container mx-auto'>
+				<Input placeholder='Enter your favorite pokemon' />
+			</div>
 			<PokemonLayout>
-				{isLoading
+				{isLoadingPokemons && pokemons.length === 0
 					? Array(6)
 							.fill(0)
 							.map((_, index) => <PokemonSkeletonCard key={index} />)
