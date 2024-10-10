@@ -1,7 +1,7 @@
 "use client";
 
 import { API_URL } from "@/consts/api";
-import { IPokemon  } from "@/types/pokemon";
+import { IPokemon } from "@/types/pokemon";
 import { memo, useEffect, useState } from "react";
 import { PokemonCard } from "./pokemon/PokemonCard";
 import { PokemonLayout } from "./pokemon/PokemonLayout";
@@ -52,24 +52,32 @@ export const Pokemons = memo(function Pokemons() {
 		if (previous) setApiUrl(previous);
 	}
 
+	function Navigation() {
+		return (
+			<div className='flex col-span-4 items-center justify-center gap-4'>
+				<Button onClick={handlePrevious} disabled={!previous}>
+					Previous
+				</Button>
+				<Button onClick={handleNext} disabled={!next}>
+					Next
+				</Button>
+			</div>
+		);
+	}
+
 	return (
 		<>
 			{!pokemons ? (
 				<Loading />
 			) : (
-				<PokemonLayout>
-					{pokemons.map(pokemon => (
-						<PokemonCard key={pokemon.id} {...pokemon} />
-					))}
-					<div className='flex col-span-4 items-center justify-center gap-4'>
-						<Button onClick={handlePrevious} disabled={!previous}>
-							Previous
-						</Button>
-						<Button onClick={handleNext} disabled={!next}>
-							Next
-						</Button>
-					</div>
-				</PokemonLayout>
+				<>
+					<PokemonLayout>
+						{pokemons.map(pokemon => (
+							<PokemonCard key={pokemon.id} {...pokemon} />
+						))}
+					</PokemonLayout>
+					<Navigation />
+				</>
 			)}
 		</>
 	);
