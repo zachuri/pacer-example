@@ -2,6 +2,7 @@
 
 import { API_URL } from "@/consts/api";
 import usePokemonStore from "@/store/pokemonStore";
+import { IPokemon } from "@/types/pokemon";
 import { memo, useEffect, useState } from "react";
 import { PokemonCard } from "./pokemon/PokemonCard";
 import { PokemonLayout } from "./pokemon/PokemonLayout";
@@ -10,11 +11,11 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 
 export const Pokemons = memo(function Pokemons() {
+	const [search, setSearch] = useState("");
 	const [error, setError] = useState<string | null>("");
 	const [apiUrl, setApiUrl] = useState<string | null>(API_URL);
-	// const [pokemons, setPokemons] = useState<IPokemon[]>([]);
-	const { pokemons, setPokemons, isLoadingPokemons, setIsLoadingPokemons } =
-		usePokemonStore();
+	const [pokemons, setPokemons] = useState<IPokemon[]>([]);
+	const { isLoadingPokemons, setIsLoadingPokemons } = usePokemonStore();
 	const [next, setNext] = useState<string | null>(null);
 	const [previous, setPrevious] = useState<string | null>(null);
 
@@ -26,7 +27,7 @@ export const Pokemons = memo(function Pokemons() {
 		async function fetchPokemon() {
 			console.log("FETCHED");
 			try {
-				const response = await fetch(`${apiUrl}?limit=6`);
+				const response = await fetch(`${apiUrl}?limit=151`);
 
 				if (!response.ok) {
 					throw new Error(`Response status: ${response.status}`);
@@ -84,6 +85,8 @@ export const Pokemons = memo(function Pokemons() {
 	return (
 		<PokemonLayout>
 			<Input
+				value={search}
+				onChange={e => setSearch(e.target.value)}
 				className='col-span-full'
 				placeholder='Enter your favorite pokemon'
 			/>
@@ -91,9 +94,9 @@ export const Pokemons = memo(function Pokemons() {
 				? Array(6)
 						.fill(0)
 						.map((_, index) => <PokemonSkeletonCard key={index} />)
-				: pokemons.map(pokemon => (
-						<PokemonCard key={pokemon.id} {...pokemon} />
-				  ))}
+				: pokemons
+						.filter(pokemon => pokemon.name.includes(search))
+						.map(pokemon => <PokemonCard key={pokemon.id} {...pokemon} />)}
 			<Navigation />
 		</PokemonLayout>
 	);
