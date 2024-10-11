@@ -15,6 +15,7 @@ export const Pokemons = memo(function Pokemons() {
 	const [error, setError] = useState<string | null>("");
 	const [apiUrl, setApiUrl] = useState<string | null>(API_URL);
 	const [pokemons, setPokemons] = useState<IPokemon[]>([]);
+	const [displayedPokemons, setDisplayedPokemons] = useState<IPokemon[]>([]);
 
 	// NOTE: I wanted to use Zustand stage but there is a limited amount of storage for the pokemons
 	// Will use useState for now as I can search through the 100+ fetch pokemons
@@ -60,6 +61,17 @@ export const Pokemons = memo(function Pokemons() {
 		fetchPokemon();
 	}, [apiUrl]); // Remove next and previous from dependencies
 
+	useEffect(() => {
+		const filteredPokemon = pokemons.filter(
+			pokemon =>
+				pokemon.name.toLowerCase().includes(search.toLowerCase()) ||
+				pokemon.types.some(type =>
+					type.type.name.toLowerCase().includes(search.toLowerCase())
+				)
+		);
+		setDisplayedPokemons(filteredPokemon);
+	}, [search, pokemons]);
+
 	function handleNext() {
 		if (next) setApiUrl(next);
 	}
@@ -97,8 +109,7 @@ export const Pokemons = memo(function Pokemons() {
 				? Array(6)
 						.fill(0)
 						.map((_, index) => <PokemonSkeletonCard key={index} />)
-				: pokemons
-						.filter(pokemon => pokemon.name.includes(search))
+				: displayedPokemons
 						.map(pokemon => <PokemonCard key={pokemon.id} {...pokemon} />)}
 			<Navigation />
 		</PokemonLayout>
