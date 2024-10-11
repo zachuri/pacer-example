@@ -15,6 +15,9 @@ export const Pokemons = memo(function Pokemons() {
 	const [error, setError] = useState<string | null>("");
 	const [apiUrl, setApiUrl] = useState<string | null>(API_URL);
 	const [pokemons, setPokemons] = useState<IPokemon[]>([]);
+
+	// NOTE: I wanted to use Zustand stage but there is a limited amount of storage for the pokemons
+	// Will use useState for now as I can search through the 100+ fetch pokemons
 	const { isLoadingPokemons, setIsLoadingPokemons } = usePokemonStore();
 	const [next, setNext] = useState<string | null>(null);
 	const [previous, setPrevious] = useState<string | null>(null);
