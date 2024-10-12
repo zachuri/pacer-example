@@ -36,7 +36,6 @@ export const Pokemons = memo(function Pokemons() {
 	const [currentUrl, setCurrentUrl] = useState(API_URL);
 
 	const fetchPokemon = useCallback(async () => {
-		console.log("FETCHED");
 		try {
 			const response = await fetch(`${currentUrl}?limit=${itemsPerPage}`);
 

@@ -27,7 +27,6 @@ export default function Page() {
 				const data = await response.json();
 
 				setPokemon(data);
-				console.log(response);
 			} catch (error) {
 				setError("Failed to load Pokemon");
 				console.error(error);
