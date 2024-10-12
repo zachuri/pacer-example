@@ -39,8 +39,6 @@ export const Pokemons = memo(function Pokemons() {
 
 				const json = await response.json();
 
-				// Map through the results and add the id
-
 				const pokemonDetails = await Promise.all(
 					json.results.map(async (pokemon: { url: string }) => {
 						const res = await fetch(pokemon.url);
@@ -109,8 +107,9 @@ export const Pokemons = memo(function Pokemons() {
 				? Array(6)
 						.fill(0)
 						.map((_, index) => <PokemonSkeletonCard key={index} />)
-				: displayedPokemons
-						.map(pokemon => <PokemonCard key={pokemon.id} {...pokemon} />)}
+				: displayedPokemons.map(pokemon => (
+						<PokemonCard key={pokemon.id} {...pokemon} />
+				  ))}
 			<Navigation />
 		</PokemonLayout>
 	);
