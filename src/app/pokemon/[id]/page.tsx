@@ -18,7 +18,7 @@ export default function Page() {
 	useEffect(() => {
 		async function fetchPokemon() {
 			try {
-				const response = await fetch(`${API_URL}/${pokemonId}` || "");
+				const response = await fetch(`${API_URL}/${pokemonId}`);
 
 				if (!response.ok) {
 					throw new Error(`Response status: ${response.status}`);
@@ -44,7 +44,7 @@ export default function Page() {
 
 	return (
 		<div className='flex flex-col items-center justify-center w-[300px]'>
-			<PokemonCard {...pokemon} />
+			<PokemonCard {...pokemon} isInteractive={false} />
 		</div>
 	);
 }
