@@ -3,12 +3,19 @@
 import { API_URL } from "@/consts/api";
 import usePokemonStore from "@/store/pokemonStore";
 import { IPokemon } from "@/types/pokemon";
-import { memo, useEffect, useState, useCallback } from "react";
+import { memo, useCallback, useEffect, useState } from "react";
 import { PokemonCard } from "./pokemon/PokemonCard";
 import { PokemonLayout } from "./pokemon/PokemonLayout";
 import PokemonSkeletonCard from "./pokemon/PokemonSkeletonCard";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "./ui/select";
 
 export const Pokemons = memo(function Pokemons() {
 	const [search, setSearch] = useState("");
@@ -18,7 +25,6 @@ export const Pokemons = memo(function Pokemons() {
 	const [displayedPokemons, setDisplayedPokemons] = useState<IPokemon[]>([]);
 	const [currentPage, setCurrentPage] = useState(1);
 	const [totalPages, setTotalPages] = useState(0);
-	const itemsPerPage = 6; // You can adjust this number
 
 	// NOTE: I wanted to use Zustand stage but there is a limited amount of storage for the pokemons
 	// Will use useState for now as I can search through the 100+ fetch pokemons
@@ -26,10 +32,14 @@ export const Pokemons = memo(function Pokemons() {
 	const [next, setNext] = useState<string | null>(null);
 	const [previous, setPrevious] = useState<string | null>(null);
 
+	const [itemsPerPage, setItemsPerPage] = useState<number>(6);
+
 	const fetchPokemon = useCallback(async () => {
 		console.log("FETCHED");
 		try {
-			const response = await fetch(`${API_URL}?offset=${(currentPage - 1) * itemsPerPage}&limit=${itemsPerPage}`);
+			const response = await fetch(
+				`${API_URL}?offset=${(currentPage - 1) * itemsPerPage}&limit=${itemsPerPage}`
+			);
 
 			if (!response.ok) {
 				throw new Error(`Response status: ${response.status}`);
@@ -54,12 +64,12 @@ export const Pokemons = memo(function Pokemons() {
 			setError("Failed to fetch data");
 			setIsLoadingPokemons(false);
 		}
-	}, [currentPage, setIsLoadingPokemons]);
+	}, [currentPage, itemsPerPage, setIsLoadingPokemons]);
 
 	useEffect(() => {
 		setIsLoadingPokemons(true);
 		fetchPokemon();
-	}, [currentPage, fetchPokemon]);
+	}, [currentPage, itemsPerPage, fetchPokemon]);
 
 	useEffect(() => {
 		const filteredPokemon = pokemons.filter(
@@ -67,7 +77,7 @@ export const Pokemons = memo(function Pokemons() {
 				pokemon.name.toLowerCase().includes(search.toLowerCase()) ||
 				pokemon.types.some(type =>
 					type.type.name.toLowerCase().includes(search.toLowerCase())
-					)
+				)
 		);
 		setDisplayedPokemons(filteredPokemon);
 	}, [search, pokemons]);
@@ -84,13 +94,21 @@ export const Pokemons = memo(function Pokemons() {
 		}
 	}
 
+	const handleLimitChange = (value: string) => {
+		const newLimit = parseInt(value, 10);
+		setItemsPerPage(newLimit);
+		setCurrentPage(1); // Reset to first page when changing limit
+	};
+
 	function Navigation() {
 		return (
 			<div className='flex col-span-full items-center justify-center gap-4'>
 				<Button onClick={handlePrevious} disabled={currentPage === 1}>
 					Previous
 				</Button>
-				<span>Page {currentPage} of {totalPages}</span>
+				<span>
+					Page {currentPage} of {totalPages}
+				</span>
 				<Button onClick={handleNext} disabled={currentPage === totalPages}>
 					Next
 				</Button>
@@ -104,12 +122,25 @@ export const Pokemons = memo(function Pokemons() {
 
 	return (
 		<PokemonLayout>
-			<Input
-				value={search}
-				onChange={e => setSearch(e.target.value)}
-				className='col-span-full'
-				placeholder='Enter your favorite pokemon'
-			/>
+			<div className='col-span-full flex flex-row gap-5'>
+				<Input
+					value={search}
+					onChange={e => setSearch(e.target.value)}
+					placeholder='Enter your favorite pokemon'
+				/>
+				<Select
+					onValueChange={handleLimitChange}
+					value={itemsPerPage.toString()}>
+					<SelectTrigger className='w-[180px]'>
+						<SelectValue placeholder='Limit' />
+					</SelectTrigger>
+					<SelectContent>
+						<SelectItem value='6'>6</SelectItem>
+						<SelectItem value='12'>12</SelectItem>
+						<SelectItem value='20'>20</SelectItem>
+					</SelectContent>
+				</Select>
+			</div>
 			{isLoadingPokemons && pokemons.length === 0
 				? Array(6)
 						.fill(0)
