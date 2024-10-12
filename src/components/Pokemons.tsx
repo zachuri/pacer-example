@@ -3,7 +3,7 @@
 import { API_URL } from "@/consts/api";
 import usePokemonStore from "@/store/pokemonStore";
 import { IPokemon } from "@/types/pokemon";
-import { memo, useEffect, useState } from "react";
+import { memo, useEffect, useState, useCallback } from "react";
 import { PokemonCard } from "./pokemon/PokemonCard";
 import { PokemonLayout } from "./pokemon/PokemonLayout";
 import PokemonSkeletonCard from "./pokemon/PokemonSkeletonCard";
@@ -16,6 +16,9 @@ export const Pokemons = memo(function Pokemons() {
 	const [apiUrl, setApiUrl] = useState<string | null>(API_URL);
 	const [pokemons, setPokemons] = useState<IPokemon[]>([]);
 	const [displayedPokemons, setDisplayedPokemons] = useState<IPokemon[]>([]);
+	const [currentPage, setCurrentPage] = useState(1);
+	const [totalPages, setTotalPages] = useState(0);
+	const itemsPerPage = 6; // You can adjust this number
 
 	// NOTE: I wanted to use Zustand stage but there is a limited amount of storage for the pokemons
 	// Will use useState for now as I can search through the 100+ fetch pokemons
@@ -23,41 +26,40 @@ export const Pokemons = memo(function Pokemons() {
 	const [next, setNext] = useState<string | null>(null);
 	const [previous, setPrevious] = useState<string | null>(null);
 
-	useEffect(() => {
-		if (pokemons.length === 0) {
-			setIsLoadingPokemons(true);
-		}
+	const fetchPokemon = useCallback(async () => {
+		console.log("FETCHED");
+		try {
+			const response = await fetch(`${API_URL}?offset=${(currentPage - 1) * itemsPerPage}&limit=${itemsPerPage}`);
 
-		async function fetchPokemon() {
-			console.log("FETCHED");
-			try {
-				const response = await fetch(`${apiUrl}?limit=151`);
-
-				if (!response.ok) {
-					throw new Error(`Response status: ${response.status}`);
-				}
-
-				const json = await response.json();
-
-				const pokemonDetails = await Promise.all(
-					json.results.map(async (pokemon: { url: string }) => {
-						const res = await fetch(pokemon.url);
-						return res.json();
-					})
-				);
-
-				setPokemons(pokemonDetails);
-				setIsLoadingPokemons(false);
-				setNext(json.next);
-				setPrevious(json.previous);
-			} catch (error) {
-				console.error(error);
-				setError("Failed to fetch data");
-				setIsLoadingPokemons(false);
+			if (!response.ok) {
+				throw new Error(`Response status: ${response.status}`);
 			}
+
+			const json = await response.json();
+
+			const pokemonDetails = await Promise.all(
+				json.results.map(async (pokemon: { url: string }) => {
+					const res = await fetch(pokemon.url);
+					return res.json();
+				})
+			);
+
+			setPokemons(pokemonDetails);
+			setIsLoadingPokemons(false);
+			setNext(json.next);
+			setPrevious(json.previous);
+			setTotalPages(Math.ceil(json.count / itemsPerPage));
+		} catch (error) {
+			console.error(error);
+			setError("Failed to fetch data");
+			setIsLoadingPokemons(false);
 		}
+	}, [currentPage, setIsLoadingPokemons]);
+
+	useEffect(() => {
+		setIsLoadingPokemons(true);
 		fetchPokemon();
-	}, [apiUrl]); // Remove next and previous from dependencies
+	}, [currentPage, fetchPokemon]);
 
 	useEffect(() => {
 		const filteredPokemon = pokemons.filter(
@@ -65,26 +67,31 @@ export const Pokemons = memo(function Pokemons() {
 				pokemon.name.toLowerCase().includes(search.toLowerCase()) ||
 				pokemon.types.some(type =>
 					type.type.name.toLowerCase().includes(search.toLowerCase())
-				)
+					)
 		);
 		setDisplayedPokemons(filteredPokemon);
 	}, [search, pokemons]);
 
 	function handleNext() {
-		if (next) setApiUrl(next);
+		if (currentPage < totalPages) {
+			setCurrentPage(prev => prev + 1);
+		}
 	}
 
 	function handlePrevious() {
-		if (previous) setApiUrl(previous);
+		if (currentPage > 1) {
+			setCurrentPage(prev => prev - 1);
+		}
 	}
 
 	function Navigation() {
 		return (
 			<div className='flex col-span-full items-center justify-center gap-4'>
-				<Button onClick={handlePrevious} disabled={!previous}>
+				<Button onClick={handlePrevious} disabled={currentPage === 1}>
 					Previous
 				</Button>
-				<Button onClick={handleNext} disabled={!next}>
+				<span>Page {currentPage} of {totalPages}</span>
+				<Button onClick={handleNext} disabled={currentPage === totalPages}>
 					Next
 				</Button>
 			</div>
