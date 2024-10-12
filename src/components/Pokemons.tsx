@@ -20,7 +20,6 @@ import {
 export const Pokemons = memo(function Pokemons() {
 	const [search, setSearch] = useState("");
 	const [error, setError] = useState<string | null>("");
-	const [apiUrl, setApiUrl] = useState<string | null>(API_URL);
 	const [pokemons, setPokemons] = useState<IPokemon[]>([]);
 	const [displayedPokemons, setDisplayedPokemons] = useState<IPokemon[]>([]);
 	const [currentPage, setCurrentPage] = useState(1);
@@ -34,12 +33,12 @@ export const Pokemons = memo(function Pokemons() {
 
 	const [itemsPerPage, setItemsPerPage] = useState<number>(6);
 
+	const [currentUrl, setCurrentUrl] = useState(API_URL);
+
 	const fetchPokemon = useCallback(async () => {
 		console.log("FETCHED");
 		try {
-			const response = await fetch(
-				`${API_URL}?offset=${(currentPage - 1) * itemsPerPage}&limit=${itemsPerPage}`
-			);
+			const response = await fetch(`${currentUrl}?limit=${itemsPerPage}`);
 
 			if (!response.ok) {
 				throw new Error(`Response status: ${response.status}`);
@@ -64,12 +63,12 @@ export const Pokemons = memo(function Pokemons() {
 			setError("Failed to fetch data");
 			setIsLoadingPokemons(false);
 		}
-	}, [currentPage, itemsPerPage, setIsLoadingPokemons]);
+	}, [currentUrl, itemsPerPage, setIsLoadingPokemons]);
 
 	useEffect(() => {
 		setIsLoadingPokemons(true);
 		fetchPokemon();
-	}, [currentPage, itemsPerPage, fetchPokemon]);
+	}, [currentUrl, itemsPerPage, fetchPokemon]);
 
 	useEffect(() => {
 		const filteredPokemon = pokemons.filter(
@@ -83,13 +82,15 @@ export const Pokemons = memo(function Pokemons() {
 	}, [search, pokemons]);
 
 	function handleNext() {
-		if (currentPage < totalPages) {
+		if (next) {
+			setCurrentUrl(next);
 			setCurrentPage(prev => prev + 1);
 		}
 	}
 
 	function handlePrevious() {
-		if (currentPage > 1) {
+		if (previous) {
+			setCurrentUrl(previous);
 			setCurrentPage(prev => prev - 1);
 		}
 	}
@@ -97,19 +98,20 @@ export const Pokemons = memo(function Pokemons() {
 	const handleLimitChange = (value: string) => {
 		const newLimit = parseInt(value, 10);
 		setItemsPerPage(newLimit);
-		setCurrentPage(1); // Reset to first page when changing limit
+		setCurrentPage(1);
+		setCurrentUrl(API_URL); // Reset to first page when changing limit
 	};
 
 	function Navigation() {
 		return (
 			<div className='flex col-span-full items-center justify-center gap-4'>
-				<Button onClick={handlePrevious} disabled={currentPage === 1}>
+				<Button onClick={handlePrevious} disabled={!previous}>
 					Previous
 				</Button>
 				<span>
 					Page {currentPage} of {totalPages}
 				</span>
-				<Button onClick={handleNext} disabled={currentPage === totalPages}>
+				<Button onClick={handleNext} disabled={!next}>
 					Next
 				</Button>
 			</div>
