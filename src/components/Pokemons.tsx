@@ -102,7 +102,7 @@ export const Pokemons = memo(function Pokemons() {
 		setCurrentUrl(API_URL); // Reset to first page when changing limit
 	};
 
-	function Navigation() {
+	function Pagination() {
 		return (
 			<div className='flex col-span-full items-center justify-center gap-4'>
 				<Button onClick={handlePrevious} disabled={!previous}>
@@ -150,7 +150,7 @@ export const Pokemons = memo(function Pokemons() {
 				: displayedPokemons.map(pokemon => (
 						<PokemonCard key={pokemon.id} {...pokemon} />
 				  ))}
-			<Navigation />
+			<Pagination />
 		</PokemonLayout>
 	);
 });
