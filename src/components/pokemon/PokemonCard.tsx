@@ -27,7 +27,6 @@ export function PokemonCard({
 	return (
 		<Link href={`/pokemon/${id}`}>
 			<Card
-				key={id}
 				className='overflow-hidden w-[300px]
         hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] transition-shadow duration-300 cursor-pointer
         '>

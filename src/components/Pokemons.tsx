@@ -61,6 +61,7 @@ export const Pokemons = memo(function Pokemons() {
 		} catch (error) {
 			console.error(error);
 			setError("Failed to fetch data");
+		} finally {
 			setIsLoadingPokemons(false);
 		}
 	}, [currentUrl, itemsPerPage, setIsLoadingPokemons]);

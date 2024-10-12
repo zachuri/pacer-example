@@ -22,7 +22,7 @@ interface ISpriteSet {
 }
 
 export interface IPokemon {
-	id: number;
+	id?: number;
 	name: string;
 	sprites: {
 		front_default: string;
@@ -47,6 +47,9 @@ export interface IPokemon {
 }
 
 export interface IPokemonInfo {
+	name: string;
+	types: [];
+	stats: [];
 	abilities: IAbility[];
 	base_experience: number;
 	cries: {

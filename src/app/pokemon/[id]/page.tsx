@@ -1,5 +1,6 @@
 "use client";
 
+import { PokemonCard } from "@/components/pokemon/PokemonCard";
 import { API_URL } from "@/consts/api";
 import { IPokemonInfo } from "@/types/pokemon";
 import { useParams } from "next/navigation";
@@ -11,6 +12,9 @@ export default function Page() {
 	const params = useParams();
 	const pokemonId = params.id;
 
+	const [isLoading, setIsLoading] = useState(true);
+	const [error, setError] = useState<string | null>(null);
+
 	useEffect(() => {
 		async function fetchPokemon() {
 			try {
@@ -20,20 +24,27 @@ export default function Page() {
 					throw new Error(`Response status: ${response.status}`);
 				}
 
-				const json: IPokemonInfo = await response.json();
+				const data = await response.json();
 
-				setPokemon(json);
-				console.log(json);
+				setPokemon(data);
+				console.log(response);
 			} catch (error) {
+				setError("Failed to load Pokemon");
 				console.error(error);
+			} finally {
+				setIsLoading(false);
 			}
 		}
 		fetchPokemon();
 	}, [pokemonId]);
 
+	if (isLoading) return <div>Loading...</div>;
+	if (error) return <div>{error}</div>;
+	if (!pokemon) return <div>No Pokémon found</div>;
+
 	return (
 		<div className='flex flex-col items-center justify-center w-[300px]'>
-			<h1>{pokemon?.forms[0].name}</h1>
+			<PokemonCard {...pokemon} />
 		</div>
 	);
 }
