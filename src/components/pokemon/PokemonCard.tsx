@@ -31,7 +31,7 @@ export function PokemonCard({
 				className='overflow-hidden w-[300px]
         hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] transition-shadow duration-300 cursor-pointer
         '>
-				<CardHeader className='p-0'>
+				<CardHeader className='p-0 border-b border-black'>
 					<div className='relative h-48 bg-gray-100'>
 						<Image
 							src={sprites.front_default}
