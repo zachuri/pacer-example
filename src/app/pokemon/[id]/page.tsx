@@ -23,6 +23,7 @@ export default function Page() {
 				const json: IPokemonInfo = await response.json();
 
 				setPokemon(json);
+				console.log(json);
 			} catch (error) {
 				console.error(error);
 			}
@@ -30,5 +31,9 @@ export default function Page() {
 		fetchPokemon();
 	}, [pokemonId]);
 
-	return <h1>{pokemon?.forms[0].name}</h1>;
+	return (
+		<div className='flex flex-col items-center justify-center w-[300px]'>
+			<h1>{pokemon?.forms[0].name}</h1>
+		</div>
+	);
 }
